@@ -68,7 +68,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 #define URC10_MOTOR_2_PWM 6 // set PWM for power control
 
 #define COOL 1       // define direction for cooling effect 
-#define HEAT 0       // define direction for heating effect 
+#define HEAT 0       // define direction for heating effect
 
 OneWire  ds(14);  // on pin 10 (a 4.7K resistor is necessary)
 
@@ -88,6 +88,7 @@ void setup() { /////////////////////////////////////////////////////////////////
   lcd.cursor();
   
   pinMode(14, OUTPUT);
+  pinMode(3, OUTPUT); // 850nm LED for signaling program stage 
   
   pinMode(URC10_MOTOR_1_DIR, OUTPUT);
   digitalWrite(URC10_MOTOR_1_DIR, HEAT);
@@ -202,12 +203,15 @@ void loop(void) {///////////////////////////////////////////////////////////////
       digitalWrite(ROT_LED_G, ROT_LED_ON);
       delay(250);
       digitalWrite(ROT_LED_G, ROT_LED_OFF);
+      digitalWrite(3, LOW);
       delay(250);
+      digitalWrite(3, HIGH);
     }
     lcd.setCursor(0, 0);
     lcd.print("               "); 
     lcd.setCursor(0, 0);
     lcd.print("Peltier Go!");
+    digitalWrite(3, LOW);
     delay(1000);
     lcd.setCursor(0, 0); 
     lcd.print("            ");
@@ -366,7 +370,7 @@ void loop(void) {///////////////////////////////////////////////////////////////
     tempPercent = 0;
     lcd.setCursor(11, 2);
     lcd.print("cAncElLeD");
-    cycle_end = true
+    cycle_end = true;
     digitalWrite(ROT_LED_R, ROT_LED_OFF);
     digitalWrite(ROT_LED_B, ROT_LED_OFF);
     delay(250);
@@ -378,21 +382,25 @@ void loop(void) {///////////////////////////////////////////////////////////////
       lcd.setCursor(11, 1);
       lcd.print("trgt:");
       lcd.print(partATemp);
+      digitalWrite(3, LOW);
     } else if((currentTime > partAMilli) && (currentTime < (partBMilli + partAMilli))) {
       tempPercent = ((partBTemp - celsius_IRobject)/partBTemp) * 100;
       lcd.setCursor(11, 1);
       lcd.print("trgt:");
       lcd.print(partBTemp);
+      digitalWrite(3, HIGH);
     } else if((currentTime > partAMilli + partBMilli) && (currentTime < (partBMilli + (partAMilli * 2)))) {
       //tempPercent = ((partATemp - celsius_IRobject)/partATemp) * 100;
       tempPercent = ((partATemp - celsius_IRobject)/partATemp) * 100;
       lcd.setCursor(11, 1);
       lcd.print("trgt:");
       lcd.print(partATemp);
+      digitalWrite(3, LOW);
     } else {
       tempPercent = 0;
       lcd.setCursor(11, 1);
       lcd.print("End    ");
+      digitalWrite(3, LOW);
       cycle_end = true;
     }
   }
